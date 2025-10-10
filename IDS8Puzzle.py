@@ -26,9 +26,17 @@ def get_neighbors(state):
             neighbors.append(new_state)
     return neighbors
 
-def depth_limited_search(state, depth, limit, visited):
+def print_state(state):
+    for row in state:
+        print(' '.join(str(cell) for cell in row))
+    print()
+
+def depth_limited_search(state, depth, limit, visited, path):
+    print(f"Exploring state at depth {depth}:")
+    print_state(state)
+
     if is_goal(state):
-        return state, depth  # Return state and depth when goal found
+        return path + [state], depth  # Return full path and depth
 
     if depth >= limit:
         return None, None
@@ -37,24 +45,20 @@ def depth_limited_search(state, depth, limit, visited):
 
     for neighbor in get_neighbors(state):
         if neighbor not in visited:
-            result, result_depth = depth_limited_search(neighbor, depth+1, limit, visited)
-            if result:
-                return result, result_depth
+            result_path, result_depth = depth_limited_search(neighbor, depth+1, limit, visited, path + [state])
+            if result_path:
+                return result_path, result_depth
 
     return None, None
 
 def iterative_deepening_search(initial_state, max_depth=30):
     for depth_limit in range(max_depth):
+        print(f"Depth Limit: {depth_limit}")
         visited = []
-        result, depth = depth_limited_search(initial_state, 0, depth_limit, visited)
-        if result:
-            return result, depth
+        result_path, depth = depth_limited_search(initial_state, 0, depth_limit, visited, [])
+        if result_path:
+            return result_path, depth
     return None, None
-
-def print_state(state):
-    for row in state:
-        print(' '.join(str(cell) for cell in row))
-    print()
 
 # Example usage
 if __name__ == "__main__":
@@ -67,10 +71,13 @@ if __name__ == "__main__":
     print("Initial State:")
     print_state(initial_state)
 
-    result, depth = iterative_deepening_search(initial_state)
+    result_path, depth = iterative_deepening_search(initial_state)
 
-    if result:
-        print(f"Goal State Reached at depth {depth}:")
-        print_state(result)
+    if result_path:
+        print(f"Goal State Reached at depth {depth}. Path length: {len(result_path)}")
+        print("Path to goal:")
+        for idx, state in enumerate(result_path):
+            print(f"Step {idx}:")
+            print_state(state)
     else:
         print("Goal state not reachable within depth limit.")
