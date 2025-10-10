@@ -28,29 +28,6 @@ def get_neighbors(board):
                 neighbors.append(neighbor)
     return neighbors
 
-def hill_climbing(n, max_steps=1000):
-    """Hill climbing algorithm to solve N-Queens."""
-    current = generate_board(n)
-    current_conflicts = compute_conflicts(current)
-
-    for step in range(max_steps):
-        if current_conflicts == 0:
-            return current  # solution found
-
-        neighbors = get_neighbors(current)
-        # Evaluate neighbors and find the one with minimum conflicts
-        neighbor_conflicts = [(compute_conflicts(neigh), neigh) for neigh in neighbors]
-        min_conflicts, best_neighbor = min(neighbor_conflicts, key=lambda x: x[0])
-
-        if min_conflicts >= current_conflicts:
-            # No improvement, local optimum reached
-            break
-
-        current = best_neighbor
-        current_conflicts = min_conflicts
-
-    return None  # no solution found within max_steps
-
 def print_board(board):
     n = len(board)
     for row in range(n):
@@ -63,9 +40,37 @@ def print_board(board):
         print(line)
     print()
 
-if __name__ == "__main__":
-    n = 8
+def hill_climbing(n, max_steps=1000):
+    """Hill climbing algorithm to solve N-Queens with step printing."""
+    current = generate_board(n)
+    current_conflicts = compute_conflicts(current)
     
+    print(f"Initial state with conflicts = {current_conflicts}:")
+    print_board(current)
+
+    for step in range(max_steps):
+        if current_conflicts == 0:
+            print(f"Goal reached at step {step}!")
+            return current  # solution found
+
+        neighbors = get_neighbors(current)
+        neighbor_conflicts = [(compute_conflicts(neigh), neigh) for neigh in neighbors]
+        min_conflicts, best_neighbor = min(neighbor_conflicts, key=lambda x: x[0])
+
+        print(f"Step {step+1}: conflicts = {min_conflicts}")
+        print_board(best_neighbor)
+
+        if min_conflicts >= current_conflicts:
+            print("No better neighbor found, local optimum reached.")
+            break
+
+        current = best_neighbor
+        current_conflicts = min_conflicts
+
+    return None  # no solution found within max_steps
+
+if __name__ == "__main__":
+    n = 4
     solution = hill_climbing(n)
     if solution:
         print("Solution found:")
